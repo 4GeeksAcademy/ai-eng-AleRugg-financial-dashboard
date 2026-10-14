@@ -69,7 +69,7 @@ function App() {
 
   return (
     <main className="dark min-h-screen bg-background text-foreground">
-      <div role="status" className="sr-only" aria-atomic="true">
+      <div role="status" lang="es" className="sr-only" aria-atomic="true">
         {loading ? "Cargando métricas financieras" : ""}
       </div>
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -79,6 +79,7 @@ function App() {
           {error ? (
             <div
               role="alert"
+              lang="es"
               className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground"
             >
               {error}

@@ -61,7 +61,7 @@ export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
     )
   }
 
-  const hasData = data.some((d) => d.income > 0 || d.outcome > 0)
+  const hasData = data.length > 0
 
   return (
     <Card className="border-border/60">
