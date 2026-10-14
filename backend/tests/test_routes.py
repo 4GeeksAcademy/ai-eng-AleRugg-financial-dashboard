@@ -47,6 +47,7 @@ def test_metrics_endpoint_respects_date_filters():
     payload = response.json()
     assert payload
     assert all(item["create_date"] == first_date for item in payload)
+    assert payload == sorted(payload, key=lambda item: item["create_date"])
 
 
 def test_b2b_endpoint_only_returns_b2b_records():

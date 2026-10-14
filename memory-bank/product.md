@@ -19,6 +19,12 @@ El frontend consulta `GET /api/metrics`. El backend también ofrece endpoints de
 - Los movimientos son simulados: el backend genera 360 registros (30 por mes durante 12 meses) con semilla `42`; no hay almacenamiento persistente.
 - El frontend muestra estados de carga y error, pero hace una sola solicitud inicial y no reintenta si la API todavía no responde.
 - El encabezado del frontend tiene el texto fijo `2024 - Full Year`, mientras que el backend asigna fechas relativas al año actual. Esa etiqueta no aplica un filtro.
-- El agrupamiento mensual convierte fechas `YYYY-MM-DD` con `new Date()` localmente. En algunas zonas horarias podría desplazar fechas de calendario; las pruebas actuales no cubren ese caso límite.
+- El agrupamiento mensual usa año y mes directamente de la fecha `YYYY-MM-DD`, sin convertirla a la zona horaria local. La prueba de cálculos mensuales incluye el primer día de un mes.
 - La generación usa `random.seed()` del módulo global; la regla propuesta es usar un generador local para no alterar el estado aleatorio compartido.
 - El terminal registra `docker compose up --build` con código de salida `0`; no se confirmó manualmente en el navegador ni mediante una solicitud a los endpoints.
+
+## Mejora reciente: `performance-optimization`
+
+- Se calcularon los KPIs en una sola pasada, se simplificó la agrupación mensual por fecha y se quitó una ordenación redundante al filtrar movimientos.
+- Las pruebas de frontend y backend, el lint y el build pasan. La mejora de velocidad no se midió y se espera que sea pequeña con los 360 movimientos actuales.
+- En términos sencillos: el tablero hace menos pasos repetidos y conserva cada movimiento en su mes correcto, evitando trabajo innecesario y errores de calendario.
