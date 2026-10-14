@@ -123,3 +123,8 @@ body,
 #root {
   min-height: 100%;
 }
+
+.recharts-surface:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 3px;
+}
