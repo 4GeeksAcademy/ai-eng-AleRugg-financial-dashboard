@@ -76,7 +76,7 @@
 }
 
 @theme inline {
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -122,4 +122,9 @@ html,
 body,
 #root {
   min-height: 100%;
+}
+
+.recharts-surface:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 3px;
 }

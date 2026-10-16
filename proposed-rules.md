@@ -1,20 +1,21 @@
 # Reglas propuestas
 
-Estas reglas se basan en una revisión estática del código; los comportamientos señalados no se validaron en ejecución.
+Estas reglas se basan en la implementación actual y una revisión estática. Son requisitos propuestos, no afirmaciones de que el comportamiento deseado ya esté implementado ni validado en ejecución. Para el procedimiento de comprobación, consultar `verification.md`.
 
 ## Frontend
 
-- **Conservar el mes de las fechas:** interpreta las fechas `YYYY-MM-DD` como fechas de calendario y evita que la zona horaria del navegador las desplace al mes anterior. Incluye una prueba para el primer día del mes. Justifican esta regla `frontend/src/lib/financial-utils.ts` y `frontend/src/lib/financial-utils.test.ts`.
-- **Mostrar el periodo real:** deriva el periodo del encabezado de los datos presentados; no lo fijes en el código. Así se evita etiquetar datos con un año incorrecto. Justifican esta regla `frontend/src/App.tsx` y `backend/app/routes.py`.
-- **Tratar fallos temporales de la API:** conserva los estados de carga y error, y permite reintentar si el backend aún no responde. Justifican esta regla `frontend/src/App.tsx` y `docker-compose.yml`.
+- **Interpretar fechas de calendario:** trata `YYYY-MM-DD` como fecha sin zona horaria y agrupa por año-mes sin convertirla de forma que pueda cambiar el día o el mes. Añade pruebas de límites de mes y de zona horaria. La implementación actual construye un `Date` desde la cadena; revisar ese camino. Referencias: `frontend/src/lib/financial-utils.ts` y `frontend/src/lib/financial-utils.test.ts`.
+- **Mostrar el periodo de los datos:** deriva el periodo del conjunto recibido o de los filtros activos; no uses una etiqueta estática. Actualmente el encabezado muestra `2024 - Full Year`, pero la respuesta se genera alrededor de la fecha actual y el texto no filtra los movimientos. Referencias: `frontend/src/App.tsx` y `backend/app/routes.py`.
+- **Recuperarse de fallos de carga:** conserva estados visibles de carga y error y ofrece reintento o recuperación cuando el backend no estaba disponible al iniciar. Hoy `App` hace una sola petición y `docker-compose.yml` no configura una comprobación de disponibilidad.
+- **Representar la respuesta que realmente se consume:** el dashboard solicita `GET /api/metrics`, y calcula en el frontend KPIs y agrupaciones a partir de movimientos. No describas los endpoints analíticos adicionales como parte del flujo del dashboard hasta que la interfaz los consuma. Mantén tipos y contrato alineados y prueba los estados de carga, error y datos recibidos.
 
 ## Backend
 
-- **Usar aleatoriedad local:** para generar datos reproducibles, crea un generador aleatorio local con semilla; evita cambiar el estado aleatorio global con `random.seed()`. Justifican esta regla `backend/app/routes.py` y `backend/tests/test_routes.py`.
-- **Preservar y probar el contrato de la API:** conserva modelos, valores permitidos y forma de las respuestas; al cambiar filtros o rutas, actualiza las pruebas correspondientes. Justifican esta regla `backend/app/routes.py` y `backend/tests/test_routes.py`.
+- **Usar aleatoriedad local:** para generar datos reproducibles, crea un generador local `random.Random(seed)` y úsalo en todas las funciones de generación; no cambies el estado aleatorio global con `random.seed()`. Referencias: `backend/app/routes.py` y `backend/tests/test_routes.py`.
+- **Preservar y probar el contrato de la API:** conserva modelos, valores permitidos, filtros y forma de las respuestas; al cambiar rutas o campos, actualiza pruebas y tipos de TypeScript que correspondan. Verifica orden cronológico y reproducibilidad. Referencias: `backend/app/routes.py`, `backend/tests/test_routes.py` y `frontend/src/lib/financial-types.ts`.
 
 ## Integración
 
-- **Mantener alineado el contrato entre frontend y backend:** coordina nombres de campos, valores y rutas; el frontend solicita `/api/metrics` y Vite lo reenvía al servicio backend. Justifican esta regla `frontend/src/App.tsx`, `frontend/src/lib/financial-types.ts`, `frontend/vite.config.ts` y `backend/app/routes.py`.
-- **No asumir que el backend está listo por el orden de inicio:** `depends_on` ordena los contenedores, pero no garantiza que la API responda. Añade una comprobación de disponibilidad o conserva reintentos en el frontend. Justifican esta regla `docker-compose.yml` y `frontend/src/App.tsx`.
-- **Mantener sincronizada la guía de ejecución:** al cambiar puertos, proxy o variables de entorno, actualiza la documentación correspondiente. Justifican esta regla `README.es.md`, `docker-compose.yml` y `frontend/vite.config.ts`.
+- **Mantener alineado el contrato en la integración:** coordina rutas, campos y valores permitidos entre FastAPI y TypeScript. Comprueba que la respuesta de `GET /api/metrics` atraviesa el proxy y alimenta los cálculos de la interfaz. Referencias: `frontend/src/App.tsx`, `frontend/src/lib/financial-types.ts`, `frontend/vite.config.ts` y `backend/app/routes.py`.
+- **Comprobar disponibilidad real:** no asumas que `depends_on` significa que el backend ya acepta peticiones. Usa reintentos en la interfaz o una comprobación de salud con espera, y prueba el caso en que el backend tarda en arrancar. Referencias: `docker-compose.yml` y `frontend/src/App.tsx`.
+- **Mantener sincronizada la documentación de ejecución:** si cambian puertos, proxy o variables de entorno, actualiza `README.es.md` y `verification.md`. Referencias: `README.es.md`, `docker-compose.yml` y `frontend/vite.config.ts`.

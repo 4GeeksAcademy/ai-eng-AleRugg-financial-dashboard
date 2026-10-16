@@ -256,7 +256,7 @@ def get_metrics(
     filtered = filter_movements(
         movements, start_date, end_date, category, operation_type
     )
-    return ensure_chronological_order(filtered)
+    return filtered
 
 
 @router.get("/api/metrics/facets", response_model=MetricsFacets)

@@ -64,7 +64,7 @@ describe("computeMonthlyData", () => {
   it("returns chronological year-month points with aggregated totals", () => {
     const unsortedCrossYearMovements: FinancialMovement[] = [
       {
-        create_date: "2026-01-08",
+        create_date: "2026-01-01",
         amount: 300,
         operation_type: "income",
         category: "sales",
